@@ -17,17 +17,17 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'type_user' => 'required|string'
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'type_user' => $validated['type_user']
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+        return response()->json(['success' => true]);
     }
 
     public function login(Request $request)
@@ -41,6 +41,16 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+    }
+
+    public function delete($id)
+    {
+        try {
+            User::find($id)->delete();
+            return response()->json(['success' => true]);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()]);
+        }    
     }
 
 }
